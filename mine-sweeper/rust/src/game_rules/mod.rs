@@ -37,7 +37,7 @@ pub fn reveal_cell_by_index(board: &mut Board, index: usize) -> Result<CellType,
     }
 }
 
-fn reveal_neighbors_of(board: &mut Board, index: usize) -> () {
+fn reveal_neighbors_of(board: &mut Board, index: usize) {
     // let mut others = false;
     let reveal_neighbor_cell = |c: CellType| -> CellType {
         match c {
@@ -98,14 +98,11 @@ fn reveal_cell_by_rc(board: &mut Board, row: usize, column: usize) -> Result<Cel
 ///
 /// * `selection` the players selection; ie: a2
 fn reveal_selection(board: &mut Board, selection: &str) -> Result<CellType, BoardError> {
-    let (row, column) = board.properties.parse(&selection)?;
+    let (row, column) = board.properties.parse(selection)?;
 
-    let res = reveal_cell_by_rc(board, row, column);
-
-    res
+    reveal_cell_by_rc(board, row, column)
 }
 
 pub fn make_move(selection: &str, board: &mut Board) -> Result<CellType, BoardError> {
-    let res = reveal_selection(board, selection);
-    res
+    reveal_selection(board, selection)
 }

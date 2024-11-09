@@ -42,8 +42,7 @@ pub fn select_bomb_locations(
     let locations = fill_set(cell_count, target_count);
 
     let resolved_locations = if flipped {
-        let all_locations: HashSet<usize> =
-            HashSet::from_iter((0usize..board.cell_count()).into_iter());
+        let all_locations: HashSet<usize> = HashSet::from_iter(0usize..board.cell_count());
 
         all_locations.difference(&locations).cloned().collect()
     } else {
@@ -62,7 +61,7 @@ pub fn select_bomb_locations(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::board_properties::Difficulty;
+    use crate::board::board_properties::Difficulty;
     use ntest::*;
 
     static TEST_BOARD: BoardProperties = BoardProperties::new(6, 6, Difficulty::Easy);

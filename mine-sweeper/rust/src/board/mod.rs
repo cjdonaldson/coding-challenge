@@ -3,9 +3,9 @@ pub mod board_properties;
 pub mod cell_type;
 
 use std::collections::HashMap;
-// use std::fmt;
+use std::fmt;
 use std::time::SystemTime;
-// use time_hms::TimeHms;
+use time_hms::TimeHms;
 
 use board_error::BoardError;
 use board_properties::{BoardProperties, Difficulty};
@@ -21,7 +21,7 @@ use crate::select_bomb_locations::select_bomb_locations;
 ///
 /// * `index` the center cell of the neighbors to check
 /// * `fn(CellType)` applied to valid neighbors
-pub fn foreach_neighbor(board: &mut Board, index: usize, f: fn(CellType) -> CellType) -> () {
+pub fn foreach_neighbor(board: &mut Board, index: usize, f: fn(CellType) -> CellType) {
     // TODO: can this be an iterator
     if let Some(indices) = board.neighbors.get(&index) {
         for n_index in indices {
@@ -108,50 +108,50 @@ impl Board {
     }
 }
 
-// fn clear_terminal() -> () {
-//     print!("{esc}[2J{esc}[1;1H", esc = 27u8 as char);
-// }
-//
-// impl fmt::Display for Board {
-//     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
-//         let elapsed = match self.start_time.elapsed() {
-//             Ok(x) => TimeHms::new(x.as_secs()),
-//             Err(_) => TimeHms::new(0), // TODO: make this infailable
-//         };
-//
-//         let stats = || {
-//             println!(
-//                 "{}    {}   {}",
-//                 elapsed,
-//                 self.properties.difficulty,
-//                 self.bomb_count - self.marked
-//             );
-//         };
-//
-//         let column_line = || {
-//             print!(" ");
-//             for c in 0..self.properties.columns {
-//                 print!("  {}", (65u8 + c as u8) as char);
-//             }
-//             println!("");
-//         };
-//
-//         let row_line = || {
-//             for r in 0..self.properties.rows {
-//                 print!("{r} ");
-//                 for c in 0..self.properties.columns {
-//                     print!("{}", self.cells[r * self.properties.columns + c]);
-//                 }
-//                 println!(" {r}");
-//             }
-//         };
-//
-//         clear_terminal();
-//         stats();
-//         column_line();
-//         row_line();
-//         column_line();
-//
-//         Ok(())
-//     }
-// }
+fn clear_terminal() {
+    print!("{esc}[2J{esc}[1;1H", esc = 27u8 as char);
+}
+
+impl fmt::Display for Board {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let elapsed = match self.start_time.elapsed() {
+            Ok(x) => TimeHms::new(x.as_secs()),
+            Err(_) => TimeHms::new(0), // TODO: make this infailable
+        };
+
+        let stats = |f: &mut fmt::Formatter<'_>| {
+            writeln!(
+                f,
+                "{}    {}   {}",
+                elapsed,
+                self.properties.difficulty,
+                self.bomb_count - self.marked
+            )
+        };
+
+        let column_line = |f: &mut fmt::Formatter<'_>| {
+            write!(f, " ")?;
+            for c in 0..self.properties.columns {
+                write!(f, "  {}", (65u8 + c as u8) as char)?;
+            }
+            writeln!(f)
+        };
+
+        let row_line = |f: &mut fmt::Formatter<'_>| {
+            for r in 0..self.properties.rows {
+                write!(f, "{r} ")?;
+                for c in 0..self.properties.columns {
+                    write!(f, "{}", self.cells[r * self.properties.columns + c])?;
+                }
+                writeln!(f, " {r}")?;
+            }
+            write!(f, "")
+        };
+
+        clear_terminal();
+        stats(f)?;
+        column_line(f)?;
+        row_line(f)?;
+        column_line(f)
+    }
+}

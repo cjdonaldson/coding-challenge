@@ -14,6 +14,9 @@ mod bomb_count;
 
 mod select_bomb_locations;
 
+const BOARD_HEIGHT: usize = 6;
+const BOARD_WIDTH: usize = 7;
+
 fn get_user_move() -> String {
     let mut user_move = String::new();
     println!("enter cell location (ie: a0), easy, medium, hard or quit: ");
@@ -45,7 +48,7 @@ fn main() {
         } else if is_hard() {
             board = Board::new(BOARD_HEIGHT, BOARD_WIDTH, Difficulty::Hard);
         } else {
-            fn bad_move(user_move: &str) -> () {
+            fn bad_move(user_move: &str) {
                 println!("invalid selection: {user_move}");
                 sleep(Duration::new(5, 0));
             }

@@ -1,4 +1,4 @@
-# [MineSweeper](https://codingchallenges.substack.com/p/coding-challenge-65-minesweeper)
+# [Minesweeper](https://codingchallenges.substack.com/p/coding-challenge-65-minesweeper)
 
 <details>
 <summary>Challenge 65</summary>

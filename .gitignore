@@ -8,3 +8,9 @@ hs_err_pid*
 
 # rust ignores
 proptest-regressions/
+
+# scala ignores
+project/project/
+.bloop/
+.bsp/
+.metals/

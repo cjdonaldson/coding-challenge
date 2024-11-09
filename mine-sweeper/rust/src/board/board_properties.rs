@@ -27,7 +27,7 @@ pub struct BoardProperties {
 }
 
 fn is_alpha(c: &char) -> bool {
-    c >= &'A' && c <= &'Z'
+    (&'A'..=&'Z').contains(&c)
 }
 
 impl BoardProperties {
@@ -122,6 +122,27 @@ impl BoardProperties {
         }
     }
 
+    fn validate_next(
+        &self, // borrow self to avoid move semantic related issues
+        index: usize,
+        row_offset: isize,
+        column_offset: isize,
+    ) -> Result<(), BoardError> {
+        let (r, c) = self.rc_from_index(index)?;
+
+        let next_row = r as isize + row_offset;
+        let next_col = c as isize + column_offset;
+
+        let is_row_valid = (0..self.rows as isize).contains(&next_row);
+        let is_col_valid = (0..self.columns as isize).contains(&next_col);
+
+        if is_row_valid && is_col_valid {
+            Ok(())
+        } else {
+            Err(BoardError::CellOutOfBounds)
+        }
+    }
+
     /// validates and derives the indicated index into the matrix
     ///
     /// * `index` the index base to apply adjustments
@@ -133,22 +154,11 @@ impl BoardProperties {
         row_offset: isize,
         column_offset: isize,
     ) -> Result<usize, BoardError> {
-        // the `?` operator reduces Result pattern matching processing
-        let (r, c) = self.rc_from_index(index)?;
-        let new_r = r as isize + row_offset;
-        let new_c = c as isize + column_offset;
-        if new_r < 0 || new_c < 0 {
-            Err(BoardError::CellOutOfBounds)
-        } else if new_r >= self.rows as isize {
-            Err(BoardError::CellOutOfBounds)
-        } else if new_c >= self.columns as isize {
-            Err(BoardError::CellOutOfBounds)
-        } else {
-            let new_index =
-                index as isize + row_offset * self.columns as isize + column_offset as isize;
-            // self.validate_rc(row, column)
-            Ok(new_index as usize)
-        }
+        self.validate_next(index, row_offset, column_offset)?;
+
+        let offset = row_offset * (self.columns as isize) + column_offset;
+
+        Ok(index + offset as usize)
     }
 
     /// converts row and column into a valid index
