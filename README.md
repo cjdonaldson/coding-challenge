@@ -18,7 +18,7 @@ Build a: (todo)
 - [Rate Limiter](https://codingchallenges.fyi/challenges/challenge-rate-limiter/)
   - https://learnxbyexample.com/scala/rate-limiting/
 - [tool using Huffman encoding](https://codingchallenges.fyi/challenges/challenge-huffman/)
-- [Own Calculator](https://codingchallenges.fyi/challenges/challenge-calculator/)
+- [Own Calculator](https://codingchallenges.fyi/challenges/challenge-calculator/) [Shunting Yard Algorithm](https://en.wikipedia.org/wiki/Shunting_yard_algorithm)
 - [Sudoku](https://codingchallenges.fyi/challenges/challenge-sudoku)
 
 Build a: (maybe)
