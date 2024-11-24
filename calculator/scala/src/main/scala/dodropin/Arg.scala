@@ -12,9 +12,17 @@ enum Arg:
       case Arg.Err(s)  => s
 
 object Arg:
-  private val parseDouble = """([0-9]+\.[0-9]+)""".r
-  private val parseInt = """([0-9]+)""".r
+  private val parseDouble = """(^\s*[0-9]+\.[0-9]+\s*)""".r.unanchored
+  private val parseInt = """(^\s*[0-9]+\s*)""".r.unanchored
 
-  def parse: PartialFunction[String, Arg] =
-    case parseDouble(x) => Arg.ADbl(x.toDouble)
-    case parseInt(x)    => Arg.AInt(x.toInt)
+  /** string => (Arg, int)
+    *
+    * Returns if possible (Arg, length of string prefix to remove).
+    *
+    * {{{
+    *   Arg.tokenize.apply("   5    + 2") // (Arg.AInt(5), 8)
+    * }}}
+    */
+  def tokenize: PartialFunction[String, (Arg, Int)] =
+    case parseDouble(x) => (Arg.ADbl(x.strip.toDouble), x.length)
+    case parseInt(x)    => (Arg.AInt(x.strip.toInt), x.length)

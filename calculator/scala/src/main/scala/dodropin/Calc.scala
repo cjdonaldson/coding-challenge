@@ -9,21 +9,29 @@ object Calc extends App {}
 
 object CalcOps {
   def apply(s: String): String =
-    val shunted: Stacks = s
-      // TODO: this is naive; and Regex is painful; so need a better tokenizer
-      .split(" ")
-      .foldLeft(Stacks.empty) { case (Stacks(output, ops), token) =>
-        Ops.parse
-          .orElse(Arg.parse)
-          .orElse { case x =>
-            throw new Exception(s"no parse for $x")
-          }
-          .andThen {
-            case a: Arg => Stacks(a :: output, ops)
-            case o: Ops => Stacks(output, o :: ops)
-          }
-          .apply(token)
-      }
+    val shunted =
+      @tailrec
+      def loop(input: String, stacks: Stacks): Stacks =
+        if (input.isEmpty) stacks
+        else
+          val (st, remove) =
+            Ops.tokenize
+              .orElse(Arg.tokenize)
+              .orElse { case x =>
+                throw new Exception(s"no parse for $x")
+              }
+              .andThen {
+                case (a: Arg, remove) =>
+                  (Stacks(a :: stacks.output, stacks.ops), remove)
+
+                case (o: Ops, remove) =>
+                  (Stacks(stacks.output, o :: stacks.ops), remove)
+              }
+              .apply(input)
+
+          loop(input.drop(remove), st)
+
+      loop(s, Stacks.empty)
 
     @tailrec
     def loop(stacks: Stacks): String =
@@ -33,6 +41,7 @@ object CalcOps {
       def remainingOps = s"unhandled op: ${stacks.ops.mkString(", ")}"
 
       stacks.output match
+        case Arg.Err(err) :: _              => err
         case x :: nil if stacks.ops.isEmpty => x.toString
         case _ :: _ =>
           stacks.ops match

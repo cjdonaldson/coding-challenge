@@ -32,11 +32,24 @@ object Ops:
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x / y) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x / y) :: rest
 
-  def parse: PartialFunction[String, Ops] =
-    case "+" => Ops.Add
-    case "-" => Ops.Sub
-    case "*" => Ops.Mul
-    case "/" => Ops.Div
+  private val parseAdd = """(^\s*\+\s*)""".r.unanchored
+  private val parseSub = """(^\s*-\s*)""".r.unanchored
+  private val parseMul = """(^\s*\*\s*)""".r.unanchored
+  private val parseDiv = """(^\s*/\s*)""".r.unanchored
+
+  /** string => (Ops, int)
+    *
+    * Returns if possible (Ops, length of string prefix to remove).
+    *
+    * {{{
+    *   Arg.tokenize.apply("    + 2") // (Ops.Add, 6)
+    * }}}
+    */
+  def tokenize: PartialFunction[String, (Ops, Int)] =
+    case parseAdd(m) => (Ops.Add, m.length)
+    case parseSub(m) => (Ops.Sub, m.length)
+    case parseMul(m) => (Ops.Mul, m.length)
+    case parseDiv(m) => (Ops.Div, m.length)
 
   def getOpAction: PartialFunction[Ops, List[Arg] => List[Arg]] =
     case Ops.Add => Ops.Add.apply
