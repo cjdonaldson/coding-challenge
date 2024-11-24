@@ -3,6 +3,8 @@ package dodropin
 sealed trait Ops: //  extends Product with Serializable:
   def apply: PartialFunction[List[Arg], List[Arg]]
 
+  def precedence: Int
+
 object Ops:
   object Add extends Ops:
     def apply: PartialFunction[List[Arg], List[Arg]] =
@@ -10,6 +12,8 @@ object Ops:
       case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x + y) :: rest
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x + y) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x + y) :: rest
+
+    override def precedence: Int = 1
 
     override def toString: String = "+"
 
@@ -20,6 +24,8 @@ object Ops:
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x - y) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x - y) :: rest
 
+    override def precedence: Int = 1
+
     override def toString: String = "-"
 
   object Mul extends Ops:
@@ -29,6 +35,8 @@ object Ops:
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x * y) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x * y) :: rest
 
+    override def precedence: Int = 2
+
     override def toString: String = "*"
 
   object Div extends Ops:
@@ -37,6 +45,8 @@ object Ops:
       case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x / y) :: rest
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x / y) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x / y) :: rest
+
+    override def precedence: Int = 2
 
     override def toString: String = "/"
 
@@ -64,3 +74,6 @@ object Ops:
     case Ops.Sub => Ops.Sub.apply
     case Ops.Mul => Ops.Mul.apply
     case Ops.Div => Ops.Div.apply
+
+  def opHasPrecedence(op: Ops, prior: Option[Ops]) =
+    prior.fold(false)(_.precedence > op.precedence)

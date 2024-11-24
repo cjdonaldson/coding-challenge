@@ -9,59 +9,71 @@ object Calc extends App {}
 
 object CalcOps {
   def apply(s: String): String =
-    shuntingUnwrap(shuntingLoop(s, Stacks.empty))
+    shuntingUnwrap(shuntingLoop(s, State.empty))
 
   @tailrec
-  private def shuntingLoop(input: String, stacks: Stacks): Stacks =
-    if (input.isEmpty) stacks
+  private def shuntingLoop(input: String, state: State): State =
+    if (input.isEmpty) state
     else
       val (st, remove) =
         Ops.tokenize
           .orElse(Arg.tokenize)
-          .orElse { case x =>
-            (Arg.Err(x), x.length)
+          .orElse { case err =>
+            (Arg.Err(s"unhandled input: $err"), err.length)
           }
           .andThen {
-            case (a: Arg, remove) =>
-              (Stacks(a :: stacks.output, stacks.ops), remove)
+            case (arg: Arg, remove) =>
+              (State(arg :: state.output, state.ops), remove)
 
-            case (o: Ops, remove) =>
-              (Stacks(stacks.output, o :: stacks.ops), remove)
+            case (op: Ops, remove) =>
+              if (Ops.opHasPrecedence(op, state.ops.headOption))
+                val State(output, ops) = runTopOp(state)
+                (State(output, op :: ops), remove)
+              else (State(state.output, op :: state.ops), remove)
           }
           .apply(input)
 
       shuntingLoop(input.drop(remove), st)
 
+  /** Unwinds the State producing a final result
+    */
   @tailrec
-  private def shuntingUnwrap(stacks: Stacks): String =
+  private def shuntingUnwrap(state: State): String =
     def remainingVars =
-      s"oops vars left: [${stacks.output.mkString(", ")}], no ops to reduce"
+      s"oops vars left: [${state.output.mkString(", ")}], no ops to reduce"
 
-    def opsError = s"unhandled op: ${stacks.ops.mkString(", ")}"
+    def opsError = s"unhandled op: ${state.ops.mkString(", ")}"
 
-    def runFn(op: Ops, rest: List[Ops]): Stacks =
-      Ops.getOpAction
-        .andThen { fn =>
-          def opErr =
-            s"error: could not evaluate '${stacks.output.mkString(", ")} $op'"
+    state.output match
+      case Arg.Err(err) :: _ => err
 
-          val output = Try(fn(stacks.output))
-            .getOrElse(List(Arg.Err(opErr)))
+      case output :: nil if state.ops.isEmpty => output.toString
 
-          Stacks(output, rest)
-        }
-        .orElse(_ =>
-          Stacks(List(Arg.Err(s"error: unhandled operation: $op")), Nil)
-        )
-        .apply(op)
-
-    stacks.output match
-      case Arg.Err(err) :: _                   => err
-      case output :: nil if stacks.ops.isEmpty => output.toString
       case _ :: _ =>
-        stacks.ops match
-          case op :: rest => shuntingUnwrap(runFn(op, rest))
+        state.ops match
+          case op :: rest => shuntingUnwrap(runTopOp(state))
           case _          => opsError
 
       case nil => "error: no equation to evaulate"
+
+  /** Returns Stacks with top operation performed.
+    */
+  private def runTopOp(state: State): State =
+    val (op, rest) = (state.ops.head, state.ops.tail)
+
+    def opErr =
+      s"error: could not evaluate: $op using: '${state.output.mkString(", ")}'"
+
+    def opUnhandled = s"error: unhandled operation: $op"
+
+    Ops.getOpAction
+      .andThen { action =>
+        val output = Try(action(state.output))
+          .getOrElse(List(Arg.Err(opErr)))
+
+        State(output, rest)
+      }
+      .orElse(_ => State(List(Arg.Err(opUnhandled)), Nil))
+      .apply(op)
+
 }
