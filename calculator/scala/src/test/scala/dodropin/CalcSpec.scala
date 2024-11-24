@@ -14,7 +14,7 @@ class CalcSpec extends munit.FunSuite {
   }
 
   test("calc 1 + returns err") {
-    assertEquals(CalcOps("1 +"), "error: could not evaluate '1 +'")
+    assertEquals(CalcOps("1 +"), "error: could not evaluate: + using: '1'")
   }
 
   test("calc 4 - 3 returns 1") {
