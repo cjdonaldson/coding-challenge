@@ -1,12 +1,20 @@
 package dodropin
 
 class CalcSpec extends munit.FunSuite {
+  test("empty stack reports error") {
+    assertEquals(CalcOps(""), "error: no equation to evaulate")
+  }
+
   test("calc 1 returns 1") {
-    assertEquals(dodropin.CalcOps.apply("1"), "1")
+    assertEquals(CalcOps("1"), "1")
   }
 
   test("calc 1 + 2 returns 3") {
-    assertEquals(dodropin.CalcOps.apply("1 + 2"), "3")
+    assertEquals(CalcOps("1 + 2"), "3")
+  }
+
+  test("calc 1 + returns err") {
+    assertEquals(CalcOps("1 +"), "error: could not evaluate '1 +'")
   }
 
   test("calc 4 - 3 returns 1") {

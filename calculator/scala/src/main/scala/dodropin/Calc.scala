@@ -18,7 +18,7 @@ object CalcOps {
             Ops.tokenize
               .orElse(Arg.tokenize)
               .orElse { case x =>
-                throw new Exception(s"no parse for $x")
+                (Arg.Err(x), x.length)
               }
               .andThen {
                 case (a: Arg, remove) =>
@@ -38,23 +38,32 @@ object CalcOps {
       def remainingVars =
         s"oops vars left: [${stacks.output.mkString(", ")}], no ops to reduce"
 
-      def remainingOps = s"unhandled op: ${stacks.ops.mkString(", ")}"
+      def opsError = s"unhandled op: ${stacks.ops.mkString(", ")}"
+
+      def runFn(op: Ops, rest: List[Ops]): Stacks =
+        Ops.getOpAction
+          .andThen { fn =>
+            val output = Try(fn(stacks.output))
+              .getOrElse(
+                List(Arg.Err(s"error: could not evaluate '${stacks.output
+                    .mkString(" ")} $op'"))
+              )
+            Stacks(output, rest)
+          }
+          .orElse(_ =>
+            Stacks(List(Arg.Err(s"error: unhandled operation: $op")), Nil)
+          )
+          .apply(op)
 
       stacks.output match
-        case Arg.Err(err) :: _              => err
-        case x :: nil if stacks.ops.isEmpty => x.toString
+        case Arg.Err(err) :: _                   => err
+        case output :: nil if stacks.ops.isEmpty => output.toString
         case _ :: _ =>
           stacks.ops match
-            case op :: rest =>
-              val fn = Ops.getOpAction
-                .andThen(fn => Stacks(fn(stacks.output), rest))
-                .orElse(_ => Stacks(List(Arg.Err(s"unhandled op: $op")), Nil))
-                .apply(op)
+            case op :: rest => loop(runFn(op, rest))
+            case _          => opsError
 
-              loop(fn)
-            case _ => remainingOps
-
-        case nil => "oops no value"
+        case nil => "error: no equation to evaulate"
 
     loop(shunted)
 }

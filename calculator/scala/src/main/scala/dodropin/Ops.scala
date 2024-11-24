@@ -11,12 +11,16 @@ object Ops:
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x + y) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x + y) :: rest
 
+    override def toString: String = "+"
+
   object Sub extends Ops:
     def apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x - y) :: rest
       case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x - y) :: rest
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x - y) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x - y) :: rest
+
+    override def toString: String = "-"
 
   object Mul extends Ops:
     def apply: PartialFunction[List[Arg], List[Arg]] =
@@ -25,12 +29,16 @@ object Ops:
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x * y) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x * y) :: rest
 
+    override def toString: String = "*"
+
   object Div extends Ops:
     def apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x / y) :: rest
       case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x / y) :: rest
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x / y) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x / y) :: rest
+
+    override def toString: String = "/"
 
   private val parseAdd = """(^\s*\+\s*)""".r.unanchored
   private val parseSub = """(^\s*-\s*)""".r.unanchored
