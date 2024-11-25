@@ -7,7 +7,7 @@ ThisBuild / organizationName := "dodropin"
 
 lazy val root = (project in file("."))
   .settings(
-    name := "my-calc-cli",
+    name := "calc",
     libraryDependencies += munit % Test,
     scalacOptions += "-explain"
   )

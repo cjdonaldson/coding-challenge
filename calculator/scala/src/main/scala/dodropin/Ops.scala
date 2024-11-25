@@ -1,12 +1,21 @@
 package dodropin
 
-sealed trait Ops: //  extends Product with Serializable:
+/** Returns encoding of PEMDAS / GEMS and functions (named entities).
+  *
+  * Operation precedence
+  *   - 5 Groupings / Parenthesis / brackets: ({[]})
+  *   - 4 Functions: sin, cos, tan TODO:
+  *   - 3 Exponents
+  *   - 2 Multiply | Divide
+  *   - 1 Add | Subtract
+  */
+sealed trait Ops:
   def apply: PartialFunction[List[Arg], List[Arg]]
 
   def precedence: Int
 
 object Ops:
-  private val parenPrecedence = 3
+  private val parenPrecedence = 5
 
   object Add extends Ops:
     val apply: PartialFunction[List[Arg], List[Arg]] =
@@ -51,6 +60,20 @@ object Ops:
     override val precedence: Int = 2
 
     override def toString: String = "/"
+
+  object Exp extends Ops:
+    import scala.math.pow
+    val apply: PartialFunction[List[Arg], List[Arg]] =
+      case Arg.AInt(y) :: Arg.AInt(x) :: rest =>
+        Arg.AInt(pow(x, y).toInt) :: rest
+
+      case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(pow(x, y)) :: rest
+      case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(pow(x, y)) :: rest
+      case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(pow(x, y)) :: rest
+
+    override val precedence: Int = 4
+
+    override def toString: String = "^"
 
   object ParenLeft extends Ops:
     val apply: PartialFunction[List[Arg], List[Arg]] =
@@ -105,6 +128,8 @@ object Ops:
   private val parseMul = """(^\s*\*)""".r.unanchored
   private val parseDiv = """(^\s*/)""".r.unanchored
 
+  private val parseExponent = """(^\s*\^)""".r.unanchored
+
   private val parseParenLeft = """(^\s*\()""".r.unanchored
   private val parseCurlyLeft = """(^\s*\{)""".r.unanchored
   private val parseSquarLeft = """(^\s*\[)""".r.unanchored
@@ -125,6 +150,7 @@ object Ops:
     case parseSub(m)        => (Ops.Sub, m.length)
     case parseMul(m)        => (Ops.Mul, m.length)
     case parseDiv(m)        => (Ops.Div, m.length)
+    case parseExponent(m)   => (Ops.Exp, m.length)
     case parseParenLeft(m)  => (Ops.ParenLeft, m.length)
     case parseCurlyLeft(m)  => (Ops.CurlyLeft, m.length)
     case parseSquarLeft(m)  => (Ops.SquarLeft, m.length)
@@ -137,6 +163,7 @@ object Ops:
     case Ops.Sub => Ops.Sub.apply
     case Ops.Mul => Ops.Mul.apply
     case Ops.Div => Ops.Div.apply
+    case Ops.Exp => Ops.Exp.apply
 
   private val notThese = Set(
     ParenLeft,

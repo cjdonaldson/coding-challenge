@@ -6,6 +6,13 @@ import scala.annotation.tailrec
 import scala.util.Try
 
 object CalcOps {
+  def apply(fragments: List[String]): String =
+    shuntingUnwrap(
+      fragments.foldLeft(State.empty) { case (state, fragment) =>
+        shuntingLoop(fragment, state)
+      }
+    )
+
   def apply(s: String): String =
     shuntingUnwrap(shuntingLoop(s, State.empty))
 
