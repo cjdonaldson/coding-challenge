@@ -6,54 +6,111 @@ sealed trait Ops: //  extends Product with Serializable:
   def precedence: Int
 
 object Ops:
+  private val parenPrecedence = 3
+
   object Add extends Ops:
-    def apply: PartialFunction[List[Arg], List[Arg]] =
+    val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x + y) :: rest
       case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x + y) :: rest
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x + y) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x + y) :: rest
 
-    override def precedence: Int = 1
+    override val precedence: Int = 1
 
     override def toString: String = "+"
 
   object Sub extends Ops:
-    def apply: PartialFunction[List[Arg], List[Arg]] =
+    val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x - y) :: rest
       case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x - y) :: rest
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x - y) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x - y) :: rest
 
-    override def precedence: Int = 1
+    override val precedence: Int = 1
 
     override def toString: String = "-"
 
   object Mul extends Ops:
-    def apply: PartialFunction[List[Arg], List[Arg]] =
+    val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x * y) :: rest
       case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x * y) :: rest
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x * y) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x * y) :: rest
 
-    override def precedence: Int = 2
+    override val precedence: Int = 2
 
     override def toString: String = "*"
 
   object Div extends Ops:
-    def apply: PartialFunction[List[Arg], List[Arg]] =
+    val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x / y) :: rest
       case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x / y) :: rest
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x / y) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x / y) :: rest
 
-    override def precedence: Int = 2
+    override val precedence: Int = 2
 
     override def toString: String = "/"
 
-  private val parseAdd = """(^\s*\+\s*)""".r.unanchored
-  private val parseSub = """(^\s*-\s*)""".r.unanchored
-  private val parseMul = """(^\s*\*\s*)""".r.unanchored
-  private val parseDiv = """(^\s*/\s*)""".r.unanchored
+  object ParenLeft extends Ops:
+    val apply: PartialFunction[List[Arg], List[Arg]] =
+      case x => x
+
+    override val precedence: Int = parenPrecedence
+
+    override def toString: String = "("
+
+  object ParenRight extends Ops:
+    val apply: PartialFunction[List[Arg], List[Arg]] =
+      case x => x
+
+    override val precedence: Int = parenPrecedence
+
+    override def toString: String = ")"
+
+  object CurlyLeft extends Ops:
+    val apply: PartialFunction[List[Arg], List[Arg]] =
+      case x => x
+
+    override val precedence: Int = parenPrecedence
+
+    override def toString: String = "{"
+
+  object CurlyRight extends Ops:
+    val apply: PartialFunction[List[Arg], List[Arg]] =
+      case x => x
+
+    override val precedence: Int = parenPrecedence
+
+    override def toString: String = "]"
+
+  object SquarLeft extends Ops:
+    val apply: PartialFunction[List[Arg], List[Arg]] =
+      case x => x
+
+    override val precedence: Int = parenPrecedence
+
+    override def toString: String = "["
+
+  object SquarRight extends Ops:
+    val apply: PartialFunction[List[Arg], List[Arg]] =
+      case x => x
+
+    override val precedence: Int = parenPrecedence
+
+    override val toString: String = "]"
+
+  private val parseAdd = """(^\s*\+)""".r.unanchored
+  private val parseSub = """(^\s*-)""".r.unanchored
+  private val parseMul = """(^\s*\*)""".r.unanchored
+  private val parseDiv = """(^\s*/)""".r.unanchored
+
+  private val parseParenLeft = """(^\s*\()""".r.unanchored
+  private val parseCurlyLeft = """(^\s*\{)""".r.unanchored
+  private val parseSquarLeft = """(^\s*\[)""".r.unanchored
+  private val parseParenRight = """(^\s*\))""".r.unanchored
+  private val parseCurlyRight = """(^\s*\})""".r.unanchored
+  private val parseSquarRight = """(^\s*\])""".r.unanchored
 
   /** string => (Ops, int)
     *
@@ -64,10 +121,16 @@ object Ops:
     * }}}
     */
   def tokenize: PartialFunction[String, (Ops, Int)] =
-    case parseAdd(m) => (Ops.Add, m.length)
-    case parseSub(m) => (Ops.Sub, m.length)
-    case parseMul(m) => (Ops.Mul, m.length)
-    case parseDiv(m) => (Ops.Div, m.length)
+    case parseAdd(m)        => (Ops.Add, m.length)
+    case parseSub(m)        => (Ops.Sub, m.length)
+    case parseMul(m)        => (Ops.Mul, m.length)
+    case parseDiv(m)        => (Ops.Div, m.length)
+    case parseParenLeft(m)  => (Ops.ParenLeft, m.length)
+    case parseCurlyLeft(m)  => (Ops.CurlyLeft, m.length)
+    case parseSquarLeft(m)  => (Ops.SquarLeft, m.length)
+    case parseParenRight(m) => (Ops.ParenRight, m.length)
+    case parseCurlyRight(m) => (Ops.CurlyRight, m.length)
+    case parseSquarRight(m) => (Ops.SquarRight, m.length)
 
   def getOpAction: PartialFunction[Ops, List[Arg] => List[Arg]] =
     case Ops.Add => Ops.Add.apply
@@ -75,5 +138,13 @@ object Ops:
     case Ops.Mul => Ops.Mul.apply
     case Ops.Div => Ops.Div.apply
 
+  private val notThese = Set(
+    ParenLeft,
+    CurlyLeft,
+    SquarLeft
+  )
+
   def opHasPrecedence(op: Ops, prior: Option[Ops]) =
-    prior.fold(false)(_.precedence > op.precedence)
+    prior
+      .filterNot(p => notThese.exists(_ == p))
+      .fold(false)(_.precedence > op.precedence)

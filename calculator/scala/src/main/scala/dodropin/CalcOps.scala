@@ -20,12 +20,24 @@ object CalcOps {
             (Arg.Err(s"unhandled input: $err"), err.length)
           }
           .andThen {
+            case (Ops.ParenRight, remove) =>
+              val State(output, ops) = runOpTil(Ops.ParenLeft, state)
+              (State(output, ops), remove)
+
+            case (Ops.CurlyRight, remove) =>
+              val State(output, ops) = runOpTil(Ops.CurlyLeft, state)
+              (State(output, ops), remove)
+
+            case (Ops.SquarRight, remove) =>
+              val State(output, ops) = runOpTil(Ops.SquarLeft, state)
+              (State(output, ops), remove)
+
             case (arg: Arg, remove) =>
               (State(arg :: state.output, state.ops), remove)
 
             case (op: Ops, remove) =>
               if (Ops.opHasPrecedence(op, state.ops.headOption))
-                val State(output, ops) = runTopOp(state)
+                val State(output, ops) = runOpOne(state)
                 (State(output, op :: ops), remove)
               else (State(state.output, op :: state.ops), remove)
           }
@@ -49,14 +61,14 @@ object CalcOps {
 
       case _ :: _ =>
         state.ops match
-          case op :: rest => shuntingUnwrap(runTopOp(state))
+          case op :: rest => shuntingUnwrap(runOpOne(state))
           case _          => opsError
 
       case nil => "error: no equation to evaulate"
 
   /** Returns Stacks with top operation performed.
     */
-  private def runTopOp(state: State): State =
+  private def runOpOne(state: State): State =
     val (op, rest) = (state.ops.head, state.ops.tail)
 
     def opErr =
@@ -73,5 +85,13 @@ object CalcOps {
       }
       .orElse(_ => State(List(Arg.Err(opUnhandled)), Nil))
       .apply(op)
+
+  @tailrec
+  private def runOpTil(op: Ops, state: State): State =
+    state.ops match
+      case sop :: rest if sop == op =>
+        state.copy(ops = rest)
+      case _ =>
+        runOpTil(op, runOpOne(state))
 
 }

@@ -48,4 +48,16 @@ class CalcSpec extends munit.FunSuite {
   test("calc 1 - 3 * 2 + 5 returns -10") {
     assertEquals(dodropin.CalcOps("1 - 3 * 2 + 5"), "-10")
   }
+
+  test("calc 3*(2 + 5) returns 21") {
+    assertEquals(dodropin.CalcOps("3*(2 + 5)"), "21")
+  }
+
+  test("calc 3*{ 2 + 5 } returns 21") {
+    assertEquals(dodropin.CalcOps("3*{ 2 + 5 }"), "21")
+  }
+
+  test("calc 3*[ 2 + 5 ] returns 21") {
+    assertEquals(dodropin.CalcOps("3*[ 2 + 5 ]"), "21")
+  }
 }
