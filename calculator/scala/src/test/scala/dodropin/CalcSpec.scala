@@ -72,4 +72,8 @@ class CalcSpec extends munit.FunSuite {
   test("calc (3-1)^5 returns 32") {
     assertEquals(CalcOps("(3-1)^5"), "32")
   }
+
+  test("calc 3+2*(3-1)^5+6*7 returns 109") {
+    assertEquals(CalcOps("3+2*(3-1)^5+6*7"), "109")
+  }
 }

@@ -15,53 +15,59 @@ sealed trait Ops:
   def precedence: Int
 
 object Ops:
-  private val parenPrecedence = 5
+  trait AddPrecedence extends Ops {
+    def precedence: Int = 1
+  }
 
-  object Add extends Ops:
+  trait MulPrecedence extends Ops {
+    def precedence: Int = 3
+  }
+
+  trait ExpPrecedence extends Ops {
+    def precedence: Int = 4
+  }
+
+  trait ParenPrecedence extends Ops {
+    def precedence: Int = 6
+  }
+
+  object Add extends AddPrecedence :
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x + y) :: rest
       case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x + y) :: rest
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x + y) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x + y) :: rest
 
-    override val precedence: Int = 1
-
     override def toString: String = "+"
 
-  object Sub extends Ops:
+  object Sub extends AddPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x - y) :: rest
       case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x - y) :: rest
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x - y) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x - y) :: rest
 
-    override val precedence: Int = 1
-
     override def toString: String = "-"
 
-  object Mul extends Ops:
+  object Mul extends MulPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x * y) :: rest
       case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x * y) :: rest
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x * y) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x * y) :: rest
 
-    override val precedence: Int = 2
-
     override def toString: String = "*"
 
-  object Div extends Ops:
+  object Div extends MulPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x / y) :: rest
       case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x / y) :: rest
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x / y) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x / y) :: rest
 
-    override val precedence: Int = 2
-
     override def toString: String = "/"
 
-  object Exp extends Ops:
+  object Exp extends ExpPrecedence:
     import scala.math.pow
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest =>
@@ -71,55 +77,43 @@ object Ops:
       case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(pow(x, y)) :: rest
       case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(pow(x, y)) :: rest
 
-    override val precedence: Int = 4
-
     override def toString: String = "^"
 
-  object ParenLeft extends Ops:
+    val apply: PartialFunction[List[Arg], List[Arg]] =
+
+  object ParenLeft extends ParenPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case x => x
-
-    override val precedence: Int = parenPrecedence
 
     override def toString: String = "("
 
-  object ParenRight extends Ops:
+  object ParenRight extends ParenPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case x => x
-
-    override val precedence: Int = parenPrecedence
 
     override def toString: String = ")"
 
-  object CurlyLeft extends Ops:
+  object CurlyLeft extends ParenPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case x => x
-
-    override val precedence: Int = parenPrecedence
 
     override def toString: String = "{"
 
-  object CurlyRight extends Ops:
+  object CurlyRight extends ParenPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case x => x
-
-    override val precedence: Int = parenPrecedence
 
     override def toString: String = "]"
 
-  object SquarLeft extends Ops:
+  object SquarLeft extends ParenPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case x => x
-
-    override val precedence: Int = parenPrecedence
 
     override def toString: String = "["
 
-  object SquarRight extends Ops:
+  object SquarRight extends ParenPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case x => x
-
-    override val precedence: Int = parenPrecedence
 
     override val toString: String = "]"
 

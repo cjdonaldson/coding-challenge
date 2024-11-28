@@ -43,10 +43,8 @@ object CalcOps {
               (State(arg :: state.output, state.ops), remove)
 
             case (op: Ops, remove) =>
-              if (Ops.opHasPrecedence(op, state.ops.headOption))
-                val State(output, ops) = runOpOne(state)
-                (State(output, op :: ops), remove)
-              else (State(state.output, op :: state.ops), remove)
+              val nextState = runTopPrecedences(op, state)
+              (State(nextState.output, op :: nextState.ops), remove)
           }
           .apply(input)
 
@@ -73,24 +71,32 @@ object CalcOps {
 
       case nil => "error: no equation to evaulate"
 
-  /** Returns Stacks with top operation performed.
+  /** Returns State with top operation performed as long as it has precedence.
+    */
+  private def runTopPrecedences(op: Ops, state: State): State =
+    if (Ops.opHasPrecedence(op, state.ops.headOption))
+      runTopPrecedences(op, runOpOne(state))
+    else state
+
+  /** Returns State with top operation performed.
     */
   private def runOpOne(state: State): State =
-    val (op, rest) = (state.ops.head, state.ops.tail)
+    State(runOpOne(state.ops.head, state.output), state.ops.tail)
 
+  /** Returns modified List of Arg with op operation performed.
+    */
+  private def runOpOne(op: Ops, output: List[Arg]): List[Arg] =
     def opErr =
-      s"error: could not evaluate: $op using: '${state.output.mkString(", ")}'"
+      s"error: could not evaluate: $op using: '${output.mkString(", ")}'"
 
     def opUnhandled = s"error: unhandled operation: $op"
 
     Ops.getOpAction
       .andThen { action =>
-        val output = Try(action(state.output))
+        Try(action(output))
           .getOrElse(List(Arg.Err(opErr)))
-
-        State(output, rest)
       }
-      .orElse(_ => State(List(Arg.Err(opUnhandled)), Nil))
+      .orElse(_ => List(Arg.Err(opUnhandled)))
       .apply(op)
 
   @tailrec
