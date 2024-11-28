@@ -59,17 +59,19 @@ object CalcOps {
 
     def opsError = s"unhandled op: ${state.ops.mkString(", ")}"
 
+
     state.output match
       case Arg.Err(err) :: _ => err
 
-      case output :: nil if state.ops.isEmpty => output.toString
+      case Nil if state.ops.isEmpty => "error: no equation to evaulate"
 
-      case _ :: _ =>
+      case output :: Nil if state.ops.isEmpty => output.toString
+
+      case _ =>
         state.ops match
           case op :: rest => shuntingUnwrap(runOpOne(state))
           case _          => opsError
 
-      case nil => "error: no equation to evaulate"
 
   /** Returns State with top operation performed as long as it has precedence.
     */
