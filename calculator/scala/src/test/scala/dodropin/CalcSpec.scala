@@ -76,4 +76,24 @@ class CalcSpec extends munit.FunSuite {
   test("calc 3+2*(3-1)^5+6*7 returns 109") {
     assertEquals(CalcOps("3+2*(3-1)^5+6*7"), "109")
   }
+
+  test("calc unknownConst returns error") {
+    assertEquals(CalcOps("unknownConst"), "error: unhandled: unknownConst")
+  }
+
+  test("calc const pi returns 3.14... ") {
+    assertEquals(CalcOps("pi"), (22.0 / 7.0).toString)
+  }
+
+  test("calc const e returns 2.718... ") {
+    assertEquals(CalcOps("e"), (2.718_281_828_459_045_235_36).toString)
+  }
+
+  test("calc 7 * pi returns 22.0 ") {
+    assertEquals(CalcOps("7 * pi"), (22.0).toString)
+  }
+
+  test("calc pi * (3 + 4) returns 22.0 ") {
+    assertEquals(CalcOps("pi * (3 + 4)"), (22.0).toString)
+  }
 }

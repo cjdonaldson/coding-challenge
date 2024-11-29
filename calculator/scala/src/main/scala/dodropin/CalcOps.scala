@@ -21,8 +21,8 @@ object CalcOps {
     if (input.isEmpty) state
     else
       val (st, remove) =
-        Ops.tokenize
-          .orElse(Arg.tokenize)
+        Arg.tokenize
+          .orElse(Ops.tokenize)
           .orElse { case err =>
             (Arg.Err(s"unhandled input: $err"), err.length)
           }
