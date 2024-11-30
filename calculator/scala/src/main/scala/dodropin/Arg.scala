@@ -27,8 +27,12 @@ object Arg:
   def tokenize: PartialFunction[String, (Arg, Int)] =
     case parseDouble(x) => (Arg.ADbl(x.strip.toDouble), x.length)
     case parseInt(x)    => (Arg.AInt(x.strip.toInt), x.length)
-    case parseConst(c) =>
-      c.strip match
-        case "pi"  => (Arg.ADbl(22.0 / 7.0), c.length)
-        case "tau" => (Arg.ADbl(2.0 * 22.0 / 7.0), c.length)
-        case "e"   => (Arg.ADbl(2.718_281_828_459_045_235_36), c.length)
+
+    case parseConst(c) if c.strip == "pi" =>
+      (Arg.ADbl(355.0 / 113.0), c.length)
+
+    case parseConst(c) if c.strip == "tau" =>
+      (Arg.ADbl(2.0 * 355.0 / 113.0), c.length)
+
+    case parseConst(c) if c.strip == "e" =>
+      (Arg.ADbl(2.718_281_828_459_045_235_36), c.length)

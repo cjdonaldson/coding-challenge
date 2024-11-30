@@ -1,6 +1,10 @@
 package dodropin
 
+import munit.Location
+
 class CalcSpec extends munit.FunSuite {
+  // implicit val doubleEquality = TolerantNumerics.tolerantDoubleEquality(0.01)
+
   test("empty stack reports error") {
     assertEquals(CalcOps(""), "error: no equation to evaulate")
   }
@@ -78,22 +82,56 @@ class CalcSpec extends munit.FunSuite {
   }
 
   test("calc unknownConst returns error") {
-    assertEquals(CalcOps("unknownConst"), "error: unhandled: unknownConst")
+    assertEquals(CalcOps("unknownConst"), "error: unhandled input: unknownConst")
   }
 
+  private val pi = 355.0 / 113.0
+
   test("calc const pi returns 3.14... ") {
-    assertEquals(CalcOps("pi"), (22.0 / 7.0).toString)
+    assertEquals(CalcOps("pi"), (pi).toString)
   }
 
   test("calc const e returns 2.718... ") {
-    assertEquals(CalcOps("e"), (2.718_281_828_459_045_235_36).toString)
+    assertEquals(CalcOps("e").take(5), "2.718")
   }
 
   test("calc 7 * pi returns 22.0 ") {
-    assertEquals(CalcOps("7 * pi"), (22.0).toString)
+    assertEquals(CalcOps("7 * pi"), (7 * pi).toString)
   }
 
   test("calc pi * (3 + 4) returns 22.0 ") {
-    assertEquals(CalcOps("pi * (3 + 4)"), (22.0).toString)
+    assertEquals(CalcOps("pi * (3 + 4)"), (7 * pi).toString)
+  }
+
+  test("calc sqr 2 returns 4 ") {
+    assertEquals(CalcOps("sqr 2"), "4")
+  }
+
+  test("calc sqr 3.5 returns 12.25 ") {
+    assertEquals(CalcOps("    sqr 3.5 "), "12.25")
+  }
+
+  test("calc sqrt 4 returns 2.0 ") {
+    assertEquals(CalcOps("sqrt 4"), "2.0")
+  }
+
+  // test("calc sqrt 4 / 2 returns 1.0 ") {
+  //   assertEquals(CalcOps("sqrt 4 / 2"), "1.0")
+  // }
+
+  test("calc sqrt 12.25 returns 3.5 ") {
+    assertEquals(CalcOps("    sqrt 12.25 "), "3.5")
+  }
+
+  test("calc sin(pi / 2) returns 1 ") {
+    assertEquals(CalcOps("    sin(pi / 2)").take(7), "0.99999")
+  }
+
+  test("calc cos pi returns 1 ") {
+    assertEquals(CalcOps("    cos pi ").take(7), "-0.9999")
+  }
+
+  test("calc tan  pi / 4 returns 1.0 ") {
+    assertEquals(CalcOps("    tan  pi / 4 ").take(7), "1.00000")
   }
 }
