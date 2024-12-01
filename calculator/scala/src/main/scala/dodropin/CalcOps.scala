@@ -23,7 +23,7 @@ object CalcOps {
       val (st, remove) =
         Arg.tokenize
           .orElse(BracketParser.tokenize)
-          .orElse(Ops.tokenize)
+          .orElse(OpParser.tokenize)
           .orElse { case err =>
             (Arg.Err(s"unhandled input: $err"), err.length)
           }
