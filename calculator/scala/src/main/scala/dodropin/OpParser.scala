@@ -8,6 +8,7 @@ object OpParser:
 
   private val parseExponent = """(^\s*\^)""".r.unanchored
 
+  private val parseFunc = """(^\s*[a-zA-Z]+[0-9]*)""".r.unanchored
 
   /** string => (Ops, int)
     *
@@ -18,11 +19,12 @@ object OpParser:
     * }}}
     */
   def tokenize: PartialFunction[String, (OpApplicable, Int)] =
-    case parseAdd(m)                            => (Ops.Add, m.length)
-    case parseSub(m)                            => (Ops.Sub, m.length)
-    case parseMul(m)                            => (Ops.Mul, m.length)
-    case parseDiv(m)                            => (Ops.Div, m.length)
-    case parseExponent(m)                       => (Ops.Exp, m.length)
+    case parseAdd(m)                      => (Ops.Add, m.length)
+    case parseSub(m)                      => (Ops.Sub, m.length)
+    case parseMul(m)                      => (Ops.Mul, m.length)
+    case parseDiv(m)                      => (Ops.Div, m.length)
+    case parseExponent(m)                 => (Ops.Exp, m.length)
+    case parseFunc(m) if Ops.supported(m) => (Ops.Func(m), m.length)
 
   def getOpAction: PartialFunction[OpApplicable, List[Arg] => List[Arg]] =
     case Ops.Add     => Ops.Add.apply
@@ -30,9 +32,10 @@ object OpParser:
     case Ops.Mul     => Ops.Mul.apply
     case Ops.Div     => Ops.Div.apply
     case Ops.Exp     => Ops.Exp.apply
+    case x: Ops.Func => x.apply
 
   def opHasPrecedence(op: Precedence, prior: Option[Precedence]) =
     prior match
-      case None => false
+      case None                  => false
       case Some(_: Bracket.Left) => false
-      case Some(o) => o.precedence > op.precedence
+      case Some(o)               => o.precedence > op.precedence

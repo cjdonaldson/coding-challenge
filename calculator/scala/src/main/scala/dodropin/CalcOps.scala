@@ -25,7 +25,7 @@ object CalcOps {
           .orElse(BracketParser.tokenize)
           .orElse(OpParser.tokenize)
           .orElse { case err =>
-            (Arg.Err(s"unhandled input: $err"), err.length)
+            (Arg.Err(s"error: unhandled input: $err"), err.length)
           }
           .andThen {
             case (left: Bracket.Left, remove) =>

@@ -1,5 +1,7 @@
 package dodropin
 
+import scala.util.Try
+
 /** Returns encoding of PEMDAS / GEMS and functions (named entities).
   */
 sealed trait Ops extends OpApplicable
@@ -57,9 +59,56 @@ object Ops:
 
     override val toString: String = "^"
 
+  def supported(m: String): Boolean =
+    Try(Ops.Func(m).apply.isDefinedAt(List(Arg.ADec(1)))).toOption
+      .contains(true)
+
+  case class Func private (fn: String)
+      extends Ops
+      with Precedence.FuncPrecedence:
+    val apply: PartialFunction[List[Arg], List[Arg]] =
+      fn match
+        case "sqr" => {
+          case Arg.AInt(x) :: rest =>
+            Arg.AInt(x * x) :: rest
+          case Arg.ADec(x) :: rest =>
+            Arg.ADec(x * x) :: rest
+        }
+        case "sqrt" => {
+          case Arg.AInt(x) :: rest =>
+            Arg.ADec(scala.math.sqrt(x.toDouble)) :: rest
+          case Arg.ADec(x) :: rest =>
+            Arg.ADec(scala.math.sqrt(x.toDouble)) :: rest
+        }
+        case "sin" => {
+          case Arg.AInt(x) :: rest =>
+            Arg.ADec(scala.math.sin(x.toDouble)) :: rest
+          case Arg.ADec(x) :: rest =>
+            Arg.ADec(scala.math.sin(x.toDouble)) :: rest
+        }
+        case "cos" => {
+          case Arg.AInt(x) :: rest =>
+            Arg.ADec(scala.math.cos(x.toDouble)) :: rest
+          case Arg.ADec(x) :: rest =>
+            Arg.ADec(scala.math.cos(x.toDouble)) :: rest
+        }
+        case "tan" => {
+          case Arg.AInt(x) :: rest =>
+            Arg.ADec(scala.math.tan(x.toDouble)) :: rest
+          case Arg.ADec(x) :: rest =>
+            Arg.ADec(scala.math.tan(x.toDouble)) :: rest
+        }
+
+    override def toString: String = fn
+
+  object Func {
+    def apply(s: String): Func = new Func(s.strip)
+  }
+
   def getOpAction: PartialFunction[OpApplicable, List[Arg] => List[Arg]] =
-    case Ops.Add => Ops.Add.apply
-    case Ops.Sub => Ops.Sub.apply
-    case Ops.Mul => Ops.Mul.apply
-    case Ops.Div => Ops.Div.apply
-    case Ops.Exp => Ops.Exp.apply
+    case Ops.Add     => Ops.Add.apply
+    case Ops.Sub     => Ops.Sub.apply
+    case Ops.Mul     => Ops.Mul.apply
+    case Ops.Div     => Ops.Div.apply
+    case Ops.Exp     => Ops.Exp.apply
+    case x: Ops.Func => x.apply

@@ -27,6 +27,10 @@ object Precedence:
   trait ExpPrecedence extends Precedence:
     val precedence: Int = 3
 
+  trait FuncPrecedence extends Precedence:
+    // precedence 0 forces a right handed eval (usage) of an arg
+    def precedence: Int = 0
+
   def opHasPrecedence(right: Precedence, left: Option[Precedence]): Boolean =
     left match
       case Some(_: Bracket.Left) => false
