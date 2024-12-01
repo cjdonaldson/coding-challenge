@@ -34,5 +34,6 @@ object Precedence:
   def opHasPrecedence(right: Precedence, left: Option[Precedence]): Boolean =
     left match
       case Some(_: Bracket.Left) => false
+      case Some(_: Op.Func)      => true
       case Some(left)            => left.precedence > right.precedence
       case _                     => false

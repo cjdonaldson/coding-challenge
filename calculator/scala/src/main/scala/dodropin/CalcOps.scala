@@ -18,14 +18,14 @@ object CalcOps {
 
   @tailrec
   private def shuntingLoop(input: String, state: State): State =
-    if (input.isEmpty) state
+    if (input.strip.isEmpty) state
     else
       val (st, remove) =
         Arg.tokenize
           .orElse(BracketParser.tokenize)
           .orElse(OpParser.tokenize)
           .orElse { case err =>
-            (Arg.Err(s"error: unhandled input: $err"), err.length)
+            (Arg.Err(s"error: unhandled input: [$err]"), err.length)
           }
           .andThen {
             case (left: Bracket.Left, remove) =>
@@ -82,7 +82,7 @@ object CalcOps {
     def opErr =
       s"error: could not evaluate: $op using: '${output.mkString(", ")}'"
 
-    def opUnhandled = s"error: unhandled operation: $op"
+    def opUnhandled = s"error: unhandled operation: [$op]"
 
     Op.getOpAction
       .andThen { action =>

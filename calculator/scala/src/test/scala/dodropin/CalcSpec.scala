@@ -78,7 +78,7 @@ class CalcSpec extends munit.FunSuite {
   }
 
   test("calc unknownConst returns error") {
-    assertEquals(CalcOps("unknownConst"), "error: unhandled input: unknownConst")
+    assertEquals(CalcOps("unknownConst"), "error: unhandled input: [unknownConst]")
   }
 
   test("calc const pi returns 3.14... ") {
@@ -109,6 +109,10 @@ class CalcSpec extends munit.FunSuite {
     assertEquals(CalcOps("sqrt 4"), "2.0")
   }
 
+  test("calc sqrt 4 / 2 returns 1.0 ") {
+    assertEquals(CalcOps("sqrt 4 / 2"), "1.0")
+  }
+
   test("calc sqrt 12.25 returns 3.5 ") {
     assertEquals(CalcOps("    sqrt 12.25 "), "3.5")
   }
@@ -121,7 +125,11 @@ class CalcSpec extends munit.FunSuite {
     assertEquals(CalcOps("    cos pi ").take(7), "-0.9999")
   }
 
-  test("calc tan  pi / 4 returns 1.0 ") {
-    assertEquals(CalcOps("    tan  pi / 4 ").take(7), "1.00000")
+  test("calc tan  pi / 4 returns 6.66910... ") {
+    assertEquals(CalcOps("    tan  pi / 4 ").take(7), "6.66910")
+  }
+
+  test("calc tan  (pi / 4) returns 1.0 ") {
+    assertEquals(CalcOps("    tan  (pi / 4) ").take(7), "1.00000")
   }
 }
