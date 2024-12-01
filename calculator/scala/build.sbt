@@ -7,14 +7,20 @@ ThisBuild / organizationName := "dodropin"
 
 assembly / assemblyMergeStrategy := {
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard
-  case x                             => MergeStrategy.first
+  case _                             => MergeStrategy.first
 }
 
 lazy val root = (project in file("."))
   .settings(
     name := "calc",
     libraryDependencies += munit % Test,
-    // scalacOptions += "-explain"
-    // scalacOptions += "-Yrangepos",
-    mainClass := Some("dodropin.Calc")
+    mainClass := Some("dodropin.Calc"),
+    scalacOptions ++= Seq( // use ++= to add to existing options
+      "-encoding",
+      "utf8", // if an option takes an arg, supply it on the same line
+      "-feature", // then put the next option on a new line for easy editing
+      "-unchecked",
+      "-Wunused:imports,privates,locals,implicits",
+      "-Werror"
+    )
   )
