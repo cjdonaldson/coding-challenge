@@ -78,7 +78,7 @@ class CalcSpec extends munit.FunSuite {
   }
 
   test("calc unknownConst returns error") {
-    assertEquals(CalcOps("unknownConst"), "error: unhandled: unknownConst")
+    assertEquals(CalcOps("unknownConst"), "unhandled input: unknownConst")
   }
 
   test("calc const pi returns 3.14... ") {

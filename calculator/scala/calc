@@ -1,0 +1,69 @@
+#!/bin/env bash
+
+usage() {
+	echo
+	echo "$(basename "$0") [assembly | bdd | clean | compile | jar <equation> | run <equation> | test | help | --help]"
+	echo "$(basename "$0") <equation>"
+	echo
+}
+
+rm_jar() {
+	rm calc.jar 2>/dev/null
+}
+
+assembly() {
+	rm_jar
+	/bin/find target -name '*jar' -delete 2>/dev/null
+	sbt assembly && find . -name 'calc-*.jar' -exec mv {} calc.jar \;
+}
+
+jar() {
+	if [ ! -f calc.jar ]; then
+		assembly
+	fi
+	java -jar calc.jar "${@}"
+
+}
+
+case "$1" in
+--help | help | "")
+	usage
+	;;
+
+assembly)
+	assembly
+	;;
+
+bdd)
+	rm_jar
+	sbt --client '~testQuick'
+	;;
+
+clean)
+	rm_jar
+	sbt --client clean
+	;;
+
+compile)
+	rm_jar
+	sbt --client compile
+	;;
+
+jar)
+	jar "${@:2}"
+	;;
+
+run)
+	rm_jar
+	sbt --client run "${@:2}"
+	;;
+
+test)
+	rm_jar
+	sbt --client test
+	;;
+
+*)
+	jar
+	;;
+esac

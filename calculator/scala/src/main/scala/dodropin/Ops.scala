@@ -79,8 +79,6 @@ object Ops:
 
     override def toString: String = "^"
 
-    val apply: PartialFunction[List[Arg], List[Arg]] =
-
   object ParenLeft extends ParenPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case x => x
