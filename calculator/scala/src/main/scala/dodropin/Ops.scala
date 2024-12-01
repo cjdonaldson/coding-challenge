@@ -9,20 +9,10 @@ package dodropin
   *   - 2 Multiply | Divide
   *   - 1 Add | Subtract
   */
-sealed trait Ops extends OpApplicable with Precedence
+sealed trait Ops extends OpApplicable
 
 object Ops:
-  trait AddPrecedence extends Ops:
-    val precedence: Int = 1
-
-  trait MulPrecedence extends Ops:
-    val precedence: Int = 2
-
-  trait ExpPrecedence extends Ops:
-    val precedence: Int = 3
-
-
-  object Add extends AddPrecedence:
+  object Add extends Ops with Precedence.AddPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x + y) :: rest
       case Arg.ADec(y) :: Arg.ADec(x) :: rest => Arg.ADec(x + y) :: rest
@@ -31,7 +21,7 @@ object Ops:
 
     override val toString: String = "+"
 
-  object Sub extends AddPrecedence:
+  object Sub extends Ops with Precedence.AddPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x - y) :: rest
       case Arg.ADec(y) :: Arg.ADec(x) :: rest => Arg.ADec(x - y) :: rest
@@ -40,7 +30,7 @@ object Ops:
 
     override val toString: String = "-"
 
-  object Mul extends MulPrecedence:
+  object Mul extends Ops with Precedence.MulPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x * y) :: rest
       case Arg.ADec(y) :: Arg.ADec(x) :: rest => Arg.ADec(x * y) :: rest
@@ -49,7 +39,7 @@ object Ops:
 
     override val toString: String = "*"
 
-  object Div extends MulPrecedence:
+  object Div extends Ops with Precedence.MulPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x / y) :: rest
       case Arg.ADec(y) :: Arg.ADec(x) :: rest => Arg.ADec(x / y) :: rest
@@ -60,7 +50,7 @@ object Ops:
 
     override val toString: String = "/"
 
-  object Exp extends ExpPrecedence:
+  object Exp extends Ops with Precedence.ExpPrecedence:
     import scala.math.pow
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest =>

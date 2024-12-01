@@ -18,6 +18,15 @@ object Precedence:
   trait RightBracketPrecedence extends Precedence:
     def leftBracket: LeftBracketPrecedence
 
+  trait AddPrecedence extends Precedence:
+    val precedence: Int = 1
+
+  trait MulPrecedence extends Precedence:
+    val precedence: Int = 2
+
+  trait ExpPrecedence extends Precedence:
+    val precedence: Int = 3
+
   def opHasPrecedence(right: Precedence, left: Option[Precedence]): Boolean =
     left match
       case Some(_: Bracket.Left) => false
