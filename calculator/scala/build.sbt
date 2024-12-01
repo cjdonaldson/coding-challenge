@@ -15,6 +15,6 @@ lazy val root = (project in file("."))
     name := "calc",
     libraryDependencies += munit % Test,
     // scalacOptions += "-explain"
-    scalacOptions += "-Yrangepos",
+    // scalacOptions += "-Yrangepos",
     mainClass := Some("dodropin.Calc")
   )

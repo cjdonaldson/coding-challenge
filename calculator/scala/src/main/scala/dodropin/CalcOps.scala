@@ -27,16 +27,11 @@ object CalcOps {
             (Arg.Err(s"unhandled input: $err"), err.length)
           }
           .andThen {
-            case (Ops.ParenRight, remove) =>
-              val State(output, ops) = runOpTil(Ops.ParenLeft, state)
-              (State(output, ops), remove)
+            case (left: Bracket.Left, remove) =>
+              (State(state.output, left :: state.ops), remove)
 
-            case (Ops.CurlyRight, remove) =>
-              val State(output, ops) = runOpTil(Ops.CurlyLeft, state)
-              (State(output, ops), remove)
-
-            case (Ops.SquarRight, remove) =>
-              val State(output, ops) = runOpTil(Ops.SquarLeft, state)
+            case (right: Bracket.Right, remove) =>
+              val State(output, ops) = runOpTil(right.leftBracket, state)
               (State(output, ops), remove)
 
             case (arg: Arg, remove) =>
@@ -59,7 +54,6 @@ object CalcOps {
 
     def opsError = s"unhandled op: ${state.ops.mkString(", ")}"
 
-
     state.output match
       case Arg.Err(err) :: _ => err
 
@@ -72,11 +66,10 @@ object CalcOps {
           case op :: rest => shuntingUnwrap(runOpOne(state))
           case _          => opsError
 
-
   /** Returns State with top operation performed as long as it has precedence.
     */
   private def runTopPrecedences(op: Ops, state: State): State =
-    if (Ops.opHasPrecedence(op, state.ops.headOption))
+    if (Precedence.opHasPrecedence(op, state.ops.headOption))
       runTopPrecedences(op, runOpOne(state))
     else state
 
@@ -87,7 +80,7 @@ object CalcOps {
 
   /** Returns modified List of Arg with op operation performed.
     */
-  private def runOpOne(op: Ops, output: List[Arg]): List[Arg] =
+  private def runOpOne(op: OpApplicable, output: List[Arg]): List[Arg] =
     def opErr =
       s"error: could not evaluate: $op using: '${output.mkString(", ")}'"
 
@@ -102,7 +95,7 @@ object CalcOps {
       .apply(op)
 
   @tailrec
-  private def runOpTil(op: Ops, state: State): State =
+  private def runOpTil(op: OpApplicable, state: State): State =
     state.ops match
       case sop :: rest if sop == op =>
         state.copy(ops = rest)
