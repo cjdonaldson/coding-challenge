@@ -81,13 +81,6 @@ object Ops:
 
   private val parseExponent = """(^\s*\^)""".r.unanchored
 
-  private val parseParenLeft = """(^\s*\()""".r.unanchored
-  private val parseCurlyLeft = """(^\s*\{)""".r.unanchored
-  private val parseSquarLeft = """(^\s*\[)""".r.unanchored
-  private val parseParenRight = """(^\s*\))""".r.unanchored
-  private val parseCurlyRight = """(^\s*\})""".r.unanchored
-  private val parseSquarRight = """(^\s*\])""".r.unanchored
-
   /** string => (Ops, int)
     *
     * Returns if possible (Ops, length of string prefix to remove).
@@ -102,12 +95,6 @@ object Ops:
     case parseMul(m)        => (Ops.Mul, m.length)
     case parseDiv(m)        => (Ops.Div, m.length)
     case parseExponent(m)   => (Ops.Exp, m.length)
-    case parseParenLeft(m)  => (Bracket.ParenLeft, m.length)
-    case parseCurlyLeft(m)  => (Bracket.CurlyLeft, m.length)
-    case parseSquarLeft(m)  => (Bracket.SquarLeft, m.length)
-    case parseParenRight(m) => (Bracket.ParenRight, m.length)
-    case parseCurlyRight(m) => (Bracket.CurlyRight, m.length)
-    case parseSquarRight(m) => (Bracket.SquarRight, m.length)
 
   def getOpAction: PartialFunction[OpApplicable, List[Arg] => List[Arg]] =
     case Ops.Add => Ops.Add.apply

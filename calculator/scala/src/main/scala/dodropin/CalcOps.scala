@@ -22,6 +22,7 @@ object CalcOps {
     else
       val (st, remove) =
         Arg.tokenize
+          .orElse(BracketParser.tokenize)
           .orElse(Ops.tokenize)
           .orElse { case err =>
             (Arg.Err(s"unhandled input: $err"), err.length)
@@ -49,8 +50,6 @@ object CalcOps {
     */
   @tailrec
   private def shuntingUnwrap(state: State): String =
-    def remainingVars =
-      s"oops vars left: [${state.output.mkString(", ")}], no ops to reduce"
 
     def opsError = s"unhandled op: ${state.ops.mkString(", ")}"
 
