@@ -38,7 +38,7 @@ object CalcOps {
             case (arg: Arg, remove) =>
               (State(arg :: state.output, state.ops), remove)
 
-            case (op: Ops, remove) =>
+            case (op: Op, remove) =>
               val nextState = runTopPrecedences(op, state)
               (State(nextState.output, op :: nextState.ops), remove)
           }
@@ -50,7 +50,6 @@ object CalcOps {
     */
   @tailrec
   private def shuntingUnwrap(state: State): String =
-
     def opsError = s"unhandled op: ${state.ops.mkString(", ")}"
 
     state.output match
@@ -67,7 +66,7 @@ object CalcOps {
 
   /** Returns State with top operation performed as long as it has precedence.
     */
-  private def runTopPrecedences(op: Ops, state: State): State =
+  private def runTopPrecedences(op: Op, state: State): State =
     if (Precedence.opHasPrecedence(op, state.ops.headOption))
       runTopPrecedences(op, runOpOne(state))
     else state
@@ -85,7 +84,7 @@ object CalcOps {
 
     def opUnhandled = s"error: unhandled operation: $op"
 
-    Ops.getOpAction
+    Op.getOpAction
       .andThen { action =>
         Try(action(output))
           .getOrElse(List(Arg.Err(opErr)))

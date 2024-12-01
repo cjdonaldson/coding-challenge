@@ -19,20 +19,20 @@ object OpParser:
     * }}}
     */
   def tokenize: PartialFunction[String, (OpApplicable, Int)] =
-    case parseAdd(m)                      => (Ops.Add, m.length)
-    case parseSub(m)                      => (Ops.Sub, m.length)
-    case parseMul(m)                      => (Ops.Mul, m.length)
-    case parseDiv(m)                      => (Ops.Div, m.length)
-    case parseExponent(m)                 => (Ops.Exp, m.length)
-    case parseFunc(m) if Ops.supported(m) => (Ops.Func(m), m.length)
+    case parseAdd(m)                      => (Op.Add, m.length)
+    case parseSub(m)                      => (Op.Sub, m.length)
+    case parseMul(m)                      => (Op.Mul, m.length)
+    case parseDiv(m)                      => (Op.Div, m.length)
+    case parseExponent(m)                 => (Op.Exp, m.length)
+    case parseFunc(m) if Op.supported(m) => (Op.Func(m), m.length)
 
   def getOpAction: PartialFunction[OpApplicable, List[Arg] => List[Arg]] =
-    case Ops.Add     => Ops.Add.apply
-    case Ops.Sub     => Ops.Sub.apply
-    case Ops.Mul     => Ops.Mul.apply
-    case Ops.Div     => Ops.Div.apply
-    case Ops.Exp     => Ops.Exp.apply
-    case x: Ops.Func => x.apply
+    case Op.Add     => Op.Add.apply
+    case Op.Sub     => Op.Sub.apply
+    case Op.Mul     => Op.Mul.apply
+    case Op.Div     => Op.Div.apply
+    case Op.Exp     => Op.Exp.apply
+    case x: Op.Func => x.apply
 
   def opHasPrecedence(op: Precedence, prior: Option[Precedence]) =
     prior match
