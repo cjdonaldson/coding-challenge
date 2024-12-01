@@ -33,8 +33,8 @@ class CalcSpec extends munit.FunSuite {
     assertEquals(CalcOps("4 * 3.0"), "12.0")
   }
 
-  test("calc 12 / 3.0 returns 4.0") {
-    assertEquals(CalcOps("12 / 3.0"), "4.0")
+  test("calc 12 / 3.0 returns 4") {
+    assertEquals(CalcOps("12 / 3.0"), "4")
   }
 
   test("calc 3 + 2 + 5 returns 10") {
@@ -82,18 +82,18 @@ class CalcSpec extends munit.FunSuite {
   }
 
   test("calc const pi returns 3.14... ") {
-    assertEquals(CalcOps("pi"), (22.0 / 7.0).toString)
+    assertEquals(CalcOps("pi").take(6), "3.1415")
   }
 
   test("calc const e returns 2.718... ") {
-    assertEquals(CalcOps("e"), (2.718_281_828_459_045_235_36).toString)
+    assertEquals(CalcOps("e").take(5), "2.718")
   }
 
-  test("calc 7 * pi returns 22.0 ") {
-    assertEquals(CalcOps("7 * pi"), (22.0).toString)
+  test("calc 113 * pi returns 355.0 ") {
+    assertEquals(CalcOps("113 * pi").take(6), "355.00")
   }
 
-  test("calc pi * (3 + 4) returns 22.0 ") {
-    assertEquals(CalcOps("pi * (3 + 4)"), (22.0).toString)
+  test("calc pi * (3 + 110) returns 355.0 ") {
+    assertEquals(CalcOps("pi * (3 + 110)").take(5), 355.0.toString)
   }
 }

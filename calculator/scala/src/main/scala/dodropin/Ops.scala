@@ -31,39 +31,41 @@ object Ops:
     def precedence: Int = 6
   }
 
-  object Add extends AddPrecedence :
+  object Add extends AddPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x + y) :: rest
-      case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x + y) :: rest
-      case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x + y) :: rest
-      case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x + y) :: rest
+      case Arg.ADec(y) :: Arg.ADec(x) :: rest => Arg.ADec(x + y) :: rest
+      case Arg.AInt(y) :: Arg.ADec(x) :: rest => Arg.ADec(x + y) :: rest
+      case Arg.ADec(y) :: Arg.AInt(x) :: rest => Arg.ADec(x + y) :: rest
 
     override def toString: String = "+"
 
   object Sub extends AddPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x - y) :: rest
-      case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x - y) :: rest
-      case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x - y) :: rest
-      case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x - y) :: rest
+      case Arg.ADec(y) :: Arg.ADec(x) :: rest => Arg.ADec(x - y) :: rest
+      case Arg.AInt(y) :: Arg.ADec(x) :: rest => Arg.ADec(x - y) :: rest
+      case Arg.ADec(y) :: Arg.AInt(x) :: rest => Arg.ADec(x - y) :: rest
 
     override def toString: String = "-"
 
   object Mul extends MulPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x * y) :: rest
-      case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x * y) :: rest
-      case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x * y) :: rest
-      case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x * y) :: rest
+      case Arg.ADec(y) :: Arg.ADec(x) :: rest => Arg.ADec(x * y) :: rest
+      case Arg.AInt(y) :: Arg.ADec(x) :: rest => Arg.ADec(x * y) :: rest
+      case Arg.ADec(y) :: Arg.AInt(x) :: rest => Arg.ADec(x * y) :: rest
 
     override def toString: String = "*"
 
   object Div extends MulPrecedence:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest => Arg.AInt(x / y) :: rest
-      case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x / y) :: rest
-      case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(x / y) :: rest
-      case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(x / y) :: rest
+      case Arg.ADec(y) :: Arg.ADec(x) :: rest => Arg.ADec(x / y) :: rest
+      case Arg.AInt(y) :: Arg.ADec(x) :: rest =>
+        Arg.ADec(x / BigDecimal(y)) :: rest
+      case Arg.ADec(y) :: Arg.AInt(x) :: rest =>
+        Arg.ADec(BigDecimal(x) / y) :: rest
 
     override def toString: String = "/"
 
@@ -72,10 +74,12 @@ object Ops:
     val apply: PartialFunction[List[Arg], List[Arg]] =
       case Arg.AInt(y) :: Arg.AInt(x) :: rest =>
         Arg.AInt(pow(x, y).toInt) :: rest
-
-      case Arg.ADbl(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(pow(x, y)) :: rest
-      case Arg.AInt(y) :: Arg.ADbl(x) :: rest => Arg.ADbl(pow(x, y)) :: rest
-      case Arg.ADbl(y) :: Arg.AInt(x) :: rest => Arg.ADbl(pow(x, y)) :: rest
+      case Arg.ADec(y) :: Arg.ADec(x) :: rest =>
+        Arg.ADec(pow(x.toDouble, y.toDouble)) :: rest
+      case Arg.AInt(y) :: Arg.ADec(x) :: rest =>
+        Arg.ADec(pow(x.toDouble, y.toDouble)) :: rest
+      case Arg.ADec(y) :: Arg.AInt(x) :: rest =>
+        Arg.ADec(pow(x.toDouble, y.toDouble)) :: rest
 
     override def toString: String = "^"
 
