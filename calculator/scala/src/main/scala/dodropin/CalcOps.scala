@@ -67,6 +67,15 @@ object CalcOps {
         if (state.output.length == 1 && state.ops.isEmpty)
           state.output.headOption
         else None
+        // state.output match
+        //   case _ if state.ops.nonEmpty => None
+        //   case head :: Nil             => state.output.headOption
+        //   case _                       => None
+        //
+        // state.output.headOption
+        //   .filter(_ => state.output.tail.isEmpty)
+        //   .filter(_ => state.ops.isEmpty)
+        //
 
     object unwrapMore:
       def unapply(state: State): Boolean =

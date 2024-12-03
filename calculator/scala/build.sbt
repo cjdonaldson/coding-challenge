@@ -19,8 +19,12 @@ lazy val root = (project in file("."))
       "-encoding",
       "utf8", // if an option takes an arg, supply it on the same line
       "-feature", // then put the next option on a new line for easy editing
+      // "-language:implicitConversions",
+      // "-language:existentials",
       "-unchecked",
       "-Wunused:imports,privates,locals,implicits",
+      "-explain",
+      // "-Yrangepos",
       "-Werror"
     )
   )
