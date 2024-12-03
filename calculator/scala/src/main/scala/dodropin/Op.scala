@@ -59,10 +59,6 @@ object Op:
 
     override val toString: String = "^"
 
-  def supported(m: String): Boolean =
-    Try(Op.Func(m).apply.isDefinedAt(List(Arg.ADec(1)))).toOption
-      .contains(true)
-
   case class Func private (fn: String)
       extends Op
       with Precedence.FuncPrecedence:
@@ -103,6 +99,13 @@ object Op:
 
   object Func {
     def apply(s: String): Func = new Func(s.strip)
+
+    def unapply(s: String): Option[String] =
+      Some(s).filter(supported)
+
+    def supported(m: String): Boolean =
+      Try(Op.Func(m.strip).apply.isDefinedAt(List(Arg.ADec(1)))).toOption
+        .contains(true)
   }
 
   def getOpAction: PartialFunction[OpApplicable, List[Arg] => List[Arg]] =

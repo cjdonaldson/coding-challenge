@@ -1,6 +1,6 @@
 package dodropin
 
-// no mutable state; programmed to immutable and was bit
+// no mutable state; against the FP way, I programmed to mutable and was bit
 // import scala.collection.mutable.Stack
 import scala.annotation.tailrec
 import scala.util.Try
@@ -52,17 +52,32 @@ object CalcOps {
   private def shuntingUnwrap(state: State): String =
     def opsError = s"unhandled op: ${state.ops.mkString(", ")}"
 
-    state.output match
-      case Arg.Err(err) :: _ => err
+    object argErr:
+      def unapply(state: State): Option[String] =
+        state.output match
+          case Arg.Err(err) :: _ => Some(err)
+          case _                 => None
 
-      case Nil if state.ops.isEmpty => "error: no equation to evaulate"
+    object noEquation:
+      def unapply(state: State): Boolean =
+        state == State.empty
 
-      case output :: Nil if state.ops.isEmpty => output.toString
+    object result:
+      def unapply(state: State): Option[Arg] =
+        if (state.output.length == 1 && state.ops.isEmpty)
+          state.output.headOption
+        else None
 
-      case _ =>
-        state.ops match
-          case op :: rest => shuntingUnwrap(runOpOne(state))
-          case _          => opsError
+    object unwrapMore:
+      def unapply(state: State): Boolean =
+        (state.output.nonEmpty && state.ops.nonEmpty)
+
+    state match
+      case argErr(err)    => err
+      case noEquation()   => "error: no equation to evaulate"
+      case result(output) => output.toString
+      case unwrapMore()   => shuntingUnwrap(runOpOne(state))
+      case _              => opsError
 
   /** Returns State with top operation performed as long as it has precedence.
     */
@@ -97,6 +112,7 @@ object CalcOps {
     state.ops match
       case sop :: rest if sop == op =>
         state.copy(ops = rest)
+
       case _ =>
         runOpTil(op, runOpOne(state))
 
