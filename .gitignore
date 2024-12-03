@@ -10,7 +10,9 @@ hs_err_pid*
 proptest-regressions/
 
 # scala ignores
-project/project/
 .bloop/
 .bsp/
 .metals/
+.scala-build/
+project/project/
+metals.sbt
