@@ -1,0 +1,1 @@
+/home/chuck/scripts/scala-shell.nix
