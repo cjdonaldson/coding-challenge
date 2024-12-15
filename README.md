@@ -1,12 +1,19 @@
 # coding-challenge
 
+These are my exploration of real project for learning Rust.
+
+And continuing refinement / exploring of Scala out side of work.
+
+Which will contain implementations of these languages to evaluate similarities and differences.
+
 <br/>[LinkedIn: John Cricket Coding Challenges](https://www.linkedin.com/company/codingchallenges/posts/?feedView=all)
 <br/>[Coding Challenges Intro](https://codingchallenges.fyi/challenges/intro)
 <br/>[The Best Way to Learn ...](https://www.linkedin.com/posts/johncrickett_the-best-way-to-learn-to-build-software-activity-7259843356074065920-GdYR)
 
 Built a: (my implementations)
-- [Minesweeper](./mine-sweeper/README.md)
-- [Connect Four](./connect-four/README.md)
+- [Minesweeper](./mine-sweeper/README.md) (TODO: Scala flavor and a nice web UI)
+- [Connect Four](./connect-four/README.md) (TODO: Scala flavor and a nice web UI)
+- [Own Calculator](https://codingchallenges.fyi/challenges/challenge-calculator/) [Shunting Yard Algorithm](https://en.wikipedia.org/wiki/Shunting_yard_algorithm) (TODO: Rust flavor)
 
 Build a: (todo)
 - [URL shortener](https://codingchallenges.fyi/challenges/challenge-url-shortener/) hash to X and base64url encode to 5 digits? 62^5 = 916_132_832 addresses
@@ -18,7 +25,6 @@ Build a: (todo)
 - [Rate Limiter](https://codingchallenges.fyi/challenges/challenge-rate-limiter/)
   - https://learnxbyexample.com/scala/rate-limiting/
 - [tool using Huffman encoding](https://codingchallenges.fyi/challenges/challenge-huffman/)
-- [Own Calculator](https://codingchallenges.fyi/challenges/challenge-calculator/) [Shunting Yard Algorithm](https://en.wikipedia.org/wiki/Shunting_yard_algorithm)
 - [Sudoku](https://codingchallenges.fyi/challenges/challenge-sudoku)
 
 Build a: (maybe)
