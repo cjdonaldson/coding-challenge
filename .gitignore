@@ -16,3 +16,4 @@ proptest-regressions/
 .scala-build/
 project/project/
 metals.sbt
+Cargo.lock
