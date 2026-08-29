@@ -1,0 +1,19 @@
+[package]
+name = "connect-four"
+version = "0.1.0"
+edition = "2021"
+authors = ["Chuck <charles.j.donaldson@gmail.com>"]
+description = "Another implementation of Coding Challenges Connect Four challenge - rust implementation."
+documentation = "https://github.com/cjdonaldson/coding-challenge"
+readme = "../README.md"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+# this does not consolidate mod creation
+# [[bin]]
+# name = "connect-four"
+# src = "src/*.rs"
+
+
+[dependencies]
+tailcall = "^1.0.1"
+itertools = "^0.13.0"
