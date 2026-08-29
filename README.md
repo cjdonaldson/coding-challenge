@@ -1,83 +1,171 @@
-# Exploring Programming Languages
+# [Build Your Own URL Shortener](https://codingchallenges.fyi/challenges/challenge-url-shortener/)
 
-This repo (it owner) uses sibling worktree development with the exception that the main trunk is code free - no merging
-back to main. This is meant to keep the projects clean and focused by not providing direct (in working trre) view of
-others work. `main` will be general documentation and meant to be agnostic to any sibling work with url links to the
-other work.
+This challenge is to build your own URL shortening service. Think bit.ly or tinyurl.com.
 
-Example structure used:
+Basically it’s a service that lets a client submit a long URL which is then shortened to make it easier to use. For
+example:
 
-coding-challenges/
-├── main
-│   ├── LICENSE
-│   ├── README.md  # <-- You are here
-├── project-a.scala
-│   ├── docs
-│   ├── README.md
-│   └── scala
-│       └─ ...
-├── project-a.rs
-│   ├── docs
-│   ├── README.md
-│   └── rust
-│       └── ...
-├── project-b.rs
-│   ├── docs
-│   ├── README.md
-│   └── rust
-│       └── ...
-└── ...
+https://www.amazon.com/Rust-Programming-Language-2nd/dp/1718503105/ref=sr_1_1?crid=3977W67XGQPJR&keywords=the+rust+programming+language&qid=1685542718&sprefix=the+%2Caps%2C3079&sr=8-1
 
-## My Apps "real" world experience
+could become: https://tinyurl.com/bdds8utd
 
-- iot app server simulator using Pekko streams
+![tiny web form](./images/tinyui.png)
 
-## coding-challenge
+This is typically done with a web based user interface, that let’s users enter a long URL and get back a shortened
+version of the URL. For example:
 
-These are my exploration of real project for learning Rust and comparing to Scala.
+<!-- <details> -->
+<!-- <summary>Challenge ??</summary> -->
 
-And continuing refinement / exploring of Scala out side of work.
+## The Challenge - Building a URL Shortening Service
 
-Which will contain implementations of these languages to evaluate similarities and differences.
+For this challenge, if you are backend focused (like me) you could just build the REST API to create a shortened URL and
+redirect a request for the shortened URL to the long URL. If you’re feeling more adventurous you could build the
+frontend too, creating a form for users to submit a URL and get back a shortened URL.
 
-### Coding Challenges
+The ultimate however would be to build both, along with some automated testing and then create a CI/CD pipeline to
+deploy the whole thing as a service to one of the cloud providers.
 
-- [LinkedIn: John Cricket Coding Challenges](https://www.linkedin.com/company/codingchallenges/posts/?feedView=all)
-- [Coding Challenges Intro](https://codingchallenges.fyi/challenges/intro)
-- [The Best Way to Learn ...](https://www.linkedin.com/posts/johncrickett_the-best-way-to-learn-to-build-software-activity-7259843356074065920-GdYR)
+If you fancy doing that don’t forget AWS offer a [free tier](https://cloud.google.com/free), Azure offers a similar set
+of services that are [free (with limits) for 12 months](https://azure.microsoft.com/en-gb/free/) and Google Cloud offers
+[20+ free products for all customers (with limits)](https://cloud.google.com/free) and $300 in free credits (at the time
+of writing).
 
-Built a (my implementations):
+### Step Zero
 
-- [Minesweeper](./mine-sweeper/README.md) (TODO: Scala flavor and a nice web UI)
-- [Connect Four](./connect-four/README.md) (TODO: Scala flavor and a nice web UI)
-- [Own Calculator](https://codingchallenges.fyi/challenges/challenge-calculator/) [Shunting Yard Algorithm](https://en.wikipedia.org/wiki/Shunting_yard_algorithm)
-    (TODO: Rust flavor)
+In this step you decide which programming language and IDE you’re going to use and you get yourself setup with a nice
+new ‘urlshortener’ project. I built my backend in Rust and frontend in TypeScript using Next and React.
 
-Build a: (todo)
+### Step 1
 
-- [URL shortener](https://codingchallenges.fyi/challenges/challenge-url-shortener/) hash to X and base64url encode to 5
-  digits? 62^5 = 916_132_832 addresses
-- [Memcached server](https://codingchallenges.fyi/challenges/challenge-memcached/)
-- [Redis server](https://codingchallenges.fyi/challenges/challenge-redis/)
-- [Redis CLI Tool](https://codingchallenges.fyi/challenges/challenge-redis-cli)
-- [Application Load Balancer](https://lnkd.in/eiBRVHNu)
-- [DNS Resolver](https://codingchallenges.fyi/challenges/challenge-dns-resolver/)
-- [Rate Limiter](https://codingchallenges.fyi/challenges/challenge-rate-limiter/)
-    - https://learnxbyexample.com/scala/rate-limiting/
-- [tool using Huffman encoding](https://codingchallenges.fyi/challenges/challenge-huffman/)
-- [Sudoku](https://codingchallenges.fyi/challenges/challenge-sudoku)
+In this step your goal is to create a REST API that will allow a client to add a URL to the list of URLs that are
+currently shortened.
 
-Build a: (maybe)
+You will need to consider where you are going to store the shortened URLs and the full URL they expand to. I’d suggest
+using some form of database for persistence. Either SQL or NoSQL will work for this. I used an in memory store for my
+version, but if I was going to deploy it, I’d probably use Redis. Why? Because I could use the version we [built in the
+build your own Redis Server challenge](https://codingchallenges.fyi/challenges/challenge-redis) for testing locally and
+when you come to deploying, Redis is also available on most cloud platforms.
 
-- [Git Client](https://lnkd.in/eG6jYyRm)
-- [Scheduling App](https://lnkd.in/eKDSRhdS)
-- [Message Broker](https://lnkd.in/eaFGTxKT)
-- [Web Server](https://lnkd.in/ezBDppnb)
-- [IRC client](https://lnkd.in/eqWfX_JR)
-- [Discord Bot](https://lnkd.in/emAymj8b)
-- [Spotify client](https://lnkd.in/eGDB9zgN)
-- [JSON parser](https://lnkd.in/ejWVe4H6)
+You will also need to decide how you’re going to generate a short key for each URL. I’d suggest you read up about [hash
+functions](https://en.wikipedia.org/wiki/Hash_function). Think carefully about how short you make it and the danger of
+shorter hashes colliding.
 
-### My implementations
+You should return a suitable [HTTP status code](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) when the
+request succeeds, along with the shortened URL, I decided to return it as JSON using the structure:
 
-- [Calc.rs](https://github.com/cjdonaldson/coding-challenge/tree/calc-rust)
+```json
+{ "key":"wsf5f", "long_url":"https://www.google.com", "short_url":"http://localhost/wsf5f" }
+```
+
+For example, calling the API with curl you should get something like this:
+
+```sh
+curl -X POST http://localhost:8080/ \ -H "Content-Type: application/json" \ -d '{"url":
+"https://www.example.com"}' {"key":"Y3S9wb", "long_url":"https://www.example.com",
+"short_url":"http://localhost/Y3S9wb"}
+```
+
+**N.B.** I’ve wrapped the JSON response above at each comma to make it fit all screens.
+
+When the URL already exists you can return the same status code and existing shortened version of the URL. In other
+words the API call to create a shortened URL should be idempotent.
+
+> [!INFO] Idempotent APIs: If you send multiple identical requests, only the first request would cause a change, all
+> subsequent requests will not change the state of the system. Therefore, the results returned to the client will not
+> depend on how many times the method has been called. It is safe to call an idempotent API multiple times with the same
+> input.
+
+If the request is invalid you should return a suitable HTTP status code and ideally a clear error message to help any
+user of the API fix their request / understand the error in their logs.
+
+```sh
+curl -X POST http://localhost/ \ -H "Content-Type: application/json" \ -d '{"wrong key":
+"https://www.example.com"}' -i HTTP/1.1 400 Bad Request
+
+Missing field: url
+```
+
+**N.B.** I’ve cut out a couple of the returned headers in the example above to make it easier to read.
+
+**Bonus Points:** Add a check to ensure that a duplicate key that is generated from a different long URL is handled. One
+option might be to add a unique value to the hash input and re-hash.
+
+### Step 2
+
+In this step your goal is to redirect a client request for the shortened URL. To do that you will need to return the
+relevant HTTP status code (I’d suggest `302 Found`) and the `Location` header.
+
+Testing it should look something like this:
+
+```sh
+curl http://localhost/jlrtPU -i HTTP/1.1 302 Found content-length: 0 location: https://www.example.com
+```
+
+If you add the -L flag to the curl command you can see if the header is valid and curl follows it - which, if it does,
+will dump the HTML of the target URL in your console. I’ll spare you pages of that!
+
+Whereas a invalid short URL might look like this:
+
+```sh
+curl http://localhost/rtfdPU -i HTTP/1.1 404 Not Found content-length: 15 URL not found
+```
+
+### Step 3
+
+In this step your goal is to extend your REST API to accept a Delete request, which should delete the shortened URL if
+it exists and take no action if it does not.
+
+```sh
+curl -X DELETE http://localhost/DmrFqF -i HTTP/1.1 200 OK content-length: 0
+```
+
+```sh
+curl http://localhost/DmrFqF -i HTTP/1.1 404 Not Found content-length: 15 URL not found
+```
+
+After the key and URL have been deleted they should no longer exist in the persistent storage/database that you’ve used.
+
+### Step 4 (Optional) GUI
+
+n this step your goal is to build a GUI to enable a user to create the shortened URLs via a simple web form without the
+need for curl.
+
+Here’s a very simple input screen you could build:
+
+![empty shorten ui](./images/emptyui.png)
+
+Then when the URL is submitted make a call to you REST API and update the UI with the result:
+
+![applied shorten ui](./images/shortenedui.png)
+
+Ideally though, your UI/UX skills are better than mine and you build a much nicer looking UI! Bonus points for a nice
+button to click to copy the shortened URL!
+
+### Step 4 (Optional) CI/CD
+
+In this step your goal is to create an automated integration and deployment pipeline so that every change to the
+codebase is automatically built, tested and deployed.
+
+My favourite tool for a small project is GitHub Actions, but all the cloud providers offer tools too. Your goal should
+me to create an automated process that ensure all commits to master are built, tested and if the tests pass, deployed to
+your chosen production environment.
+
+### Going Further
+
+Taking this further, you could add some form of user authentication and signup then integrate a payment solution like
+Stripe and you’ve built not just a real-world application, but a viable business!
+
+### Help Others by Sharing Your Solutions
+
+If you think your solution is an example other developers can learn from please share it, put it on GitHub, GitLab or
+elsewhere. Then let me know - ping me a message on the [Discord Server](https://discord.gg/zv4RKDcEKV), via
+[Twitter](https://twitter.com/johncrickett) or [LinkedIn](https://www.linkedin.com/in/johncrickett/) or just post about
+it there and tag me. Alternately please add a link to it in the [Coding Challenges Shared
+Solutions](https://github.com/CodingChallengesFYI/SharedSolutions) Github repo.
+
+<!-- </details> -->
+
+<hr/>
+
+My discussion and notes:
