@@ -1,83 +1,136 @@
-# Exploring Programming Languages
+# [Minesweeper](https://codingchallenges.substack.com/p/coding-challenge-65-minesweeper)
 
-This repo (it owner) uses sibling worktree development with the exception that the main trunk is code free - no merging
-back to main. This is meant to keep the projects clean and focused by not providing direct (in working trre) view of
-others work. `main` will be general documentation and meant to be agnostic to any sibling work with url links to the
-other work.
+<details>
+<summary>Challenge 65</summary>
 
-Example structure used:
+## Coding Challenge #65 - Minesweeper
 
-coding-challenges/
-├── main
-│   ├── LICENSE
-│   ├── README.md  # <-- You are here
-├── project-a.scala
-│   ├── docs
-│   ├── README.md
-│   └── scala
-│       └─ ...
-├── project-a.rs
-│   ├── docs
-│   ├── README.md
-│   └── rust
-│       └── ...
-├── project-b.rs
-│   ├── docs
-│   ├── README.md
-│   └── rust
-│       └── ...
-└── ...
+Level up as a software engineer by building a classic game.
 
-## My Apps "real" world experience
+## The Challenge - Building Your Own Minesweeper Game
 
-- iot app server simulator using Pekko streams
+The rules of Minesweeper are relatively simple. The board is divided into a
+grid, with mines randomly distributed in the grid cells. To win, you need to
+open all the cells that you can without triggering a mine. You mark off where
+the mines are.
 
-## coding-challenge
+The number on a cell shows the number of cells adjacent to it that contain
+mines. Using this information, you can determine if a cell is safe or if it
+contains a mine. Cells believed to contain a mine can be marked with a flag.
 
-These are my exploration of real project for learning Rust and comparing to Scala.
+<div align="center">
+<img alt="classic board" src="docs/imgs/the-classic-board.png" width="50%"/>
+</div>
 
-And continuing refinement / exploring of Scala out side of work.
+### Step Zero
 
-Which will contain implementations of these languages to evaluate similarities and differences.
+In this step, pick the programming language and development environment you’re
+going to use. Consider trying something different - this would be a great
+project to try a front-end stack if you’re a back-end developer and vice versa.
 
-### Coding Challenges
+If you’re from a data engineering or site-reliability engineering background
+you could leverage your knowledge of Python with PyGame or Go with Ebitenegine.
+Rustaceans can check out [are we game yet](https://substack.com/redirect/57393075-698a-41a4-96c4-b43a50b881f3?j=eyJ1IjoiM2kweHp3In0.eqoqIq9l1pkHHeZL7RZc_Dhwm19HgvanBSy9MG77Yzk)
+for useful crates.
 
-- [LinkedIn: John Cricket Coding Challenges](https://www.linkedin.com/company/codingchallenges/posts/?feedView=all)
-- [Coding Challenges Intro](https://codingchallenges.fyi/challenges/intro)
-- [The Best Way to Learn ...](https://www.linkedin.com/posts/johncrickett_the-best-way-to-learn-to-build-software-activity-7259843356074065920-GdYR)
+Minesweeper is relatively simple and as such, it’s a great platform for
+learning a new technology, or programming language.
 
-Built a (my implementations):
+You could create your own graphics for the game or there are some on
+opengameart.org that you can use.
 
-- [Minesweeper](./mine-sweeper/README.md) (TODO: Scala flavor and a nice web UI)
-- [Connect Four](./connect-four/README.md) (TODO: Scala flavor and a nice web UI)
-- [Own Calculator](https://codingchallenges.fyi/challenges/challenge-calculator/) [Shunting Yard Algorithm](https://en.wikipedia.org/wiki/Shunting_yard_algorithm)
-    (TODO: Rust flavor)
+### Step 1
 
-Build a: (todo)
+In this step your goal is to draw the grid for the initial game state. It
+should look something like this:
 
-- [URL shortener](https://codingchallenges.fyi/challenges/challenge-url-shortener/) hash to X and base64url encode to 5
-  digits? 62^5 = 916_132_832 addresses
-- [Memcached server](https://codingchallenges.fyi/challenges/challenge-memcached/)
-- [Redis server](https://codingchallenges.fyi/challenges/challenge-redis/)
-- [Redis CLI Tool](https://codingchallenges.fyi/challenges/challenge-redis-cli)
-- [Application Load Balancer](https://lnkd.in/eiBRVHNu)
-- [DNS Resolver](https://codingchallenges.fyi/challenges/challenge-dns-resolver/)
-- [Rate Limiter](https://codingchallenges.fyi/challenges/challenge-rate-limiter/)
-    - https://learnxbyexample.com/scala/rate-limiting/
-- [tool using Huffman encoding](https://codingchallenges.fyi/challenges/challenge-huffman/)
-- [Sudoku](https://codingchallenges.fyi/challenges/challenge-sudoku)
+<div align="center">
+<img alt="initial board" src="docs/imgs/initial-board.png" width="50%"/>
+</div>
 
-Build a: (maybe)
+The left hand number - 99 here - shows the number of mines left to find and the
+right hand number is the time in seconds since starting the game.
 
-- [Git Client](https://lnkd.in/eG6jYyRm)
-- [Scheduling App](https://lnkd.in/eKDSRhdS)
-- [Message Broker](https://lnkd.in/eaFGTxKT)
-- [Web Server](https://lnkd.in/ezBDppnb)
-- [IRC client](https://lnkd.in/eqWfX_JR)
-- [Discord Bot](https://lnkd.in/emAymj8b)
-- [Spotify client](https://lnkd.in/eGDB9zgN)
-- [JSON parser](https://lnkd.in/ejWVe4H6)
+### Step 2
 
-### My implementations
+In this step your goal is to reveal the mine / safe state after a cell is
+clicked on. That should look something like this:
 
-- [Calc.rs](https://github.com/cjdonaldson/coding-challenge/tree/calc-rust)
+<div align="center">
+<img alt="first cell" src="docs/imgs/first-cell.png" width="50%"/>
+</div>
+
+### Step 3
+
+In this step your goal is to detect hitting a mine, reveal the mines not found
+and offer to play again. For example:
+
+<div align="center">
+<img alt="kaboom" src="docs/imgs/kaboom.png" width="50%"/>
+</div>
+
+Opting to play again should re-start the game.
+
+### Step 4
+
+In this step your goal is to detect a win. A win is when all the mines are
+found. For example:
+
+<div align="center">
+<img alt="winning" src="docs/imgs/winning.png" width="25%"/>
+</div>
+
+### Going Further
+
+You can take this further by offering different size playing areas, the bigger
+the area the harder the game. You could also add a league table so people can
+record their best scores.
+</details>
+
+## running the game
+
+- docker run
+- `docker build -t my-app .`
+- `podman machine init`
+- `podman machine start`
+- `podman build -t minesweeper .`
+- `podman run --name minesweeper -i minesweeper:latest`
+
+## Layout
+
+- the board:
+    - an M x N matrix of cells
+    - cell types bomb, empty, count of neighboring bombs
+    - cells have presentation: covered, uncovered, flagged (as a bomb)
+    - a game time in seconds or minutes:seconds
+    - an uncovered bomb counter - counts down as bomb flags are planted
+- state enhancements:
+    - a private map of cell -> (valid / legal) neighboring cells
+- the rules:
+    - player can uncover a covered cell
+    - play can mark / unmark a cell with a flag
+    - player uncovering an empty cell triggers uncovering neighboring count cells
+
+## Project files structure
+
+- board/
+    - mod.rs -- the board struct and exposer of other modules
+    - Difficulty.rs -- difficulty settings
+    - cells
+- docs/
+    - imgs/ -- images used in the docs
+- game_rules/
+    - bomb_count.rs
+    - select_bomb_locations.rs
+    - process_move
+    - exspose.rs neighboring cells
+- main.rs
+- README.md -- this file
+
+https://c.r74n.com/emoji#Nature
+🚩
+🪀
+☠
+☹
+0️⃣ 1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣ 8️⃣ 9️⃣ 🔟
+0️⃣
